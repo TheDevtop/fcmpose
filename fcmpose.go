@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"regexp"
@@ -11,7 +10,6 @@ import (
 const (
 	magicMajor = `\$[a-zA-Z0-9\/\.]+\$`
 	magicMinor = `[\/a-zA-Z0-9\.]+`
-	perm       = 0622
 )
 
 var (
@@ -39,6 +37,11 @@ func compose(str string) string {
 	return str
 }
 
+func Errorln(a ...any) {
+	fmt.Fprintln(os.Stderr, a...)
+	os.Exit(1)
+}
+
 // Like os.ReadFile(), but returns string
 func readFile(path string) (string, error) {
 	if buf, err := os.ReadFile(path); err != nil {
@@ -48,27 +51,18 @@ func readFile(path string) (string, error) {
 	}
 }
 
-func usage() {
-	fmt.Println("fcmpose: Compose files with macros")
-	flag.PrintDefaults()
-	os.Exit(0)
-}
-
 func main() {
 	var (
-		inf  = flag.String("if", "", "Specify input file")
-		outf = flag.String("of", "/dev/stdout", "Specify output file")
 		fstr string
 		err  error
 	)
-
-	flag.Usage = usage
-	flag.Parse()
-
-	if fstr, err = readFile(*inf); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if len(os.Args) < 2 {
+		fmt.Println("usage: fcmpose [FILE]")
+		os.Exit(0)
 	}
-	os.WriteFile(*outf, []byte(compose(fstr)), perm)
+	if fstr, err = readFile(os.Args[1]); err != nil {
+		Errorln(err)
+	}
+	fmt.Print(compose(fstr))
 	os.Exit(0)
 }
