@@ -1,5 +1,11 @@
 package main
 
+/*
+	This Source Code Form is subject to the terms of the Mozilla Public
+	License, v. 2.0. If a copy of the MPL was not distributed with this
+	file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
 import (
 	"fmt"
 	"os"
@@ -29,15 +35,14 @@ func compose(str string) string {
 			err error
 		)
 		if sts, err = readFile(rexMinor.FindString(match)); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			errorln(err)
 		}
 		str = strings.ReplaceAll(str, match, compose(sts))
 	}
 	return str
 }
 
-func Errorln(a ...any) {
+func errorln(a ...any) {
 	fmt.Fprintln(os.Stderr, a...)
 	os.Exit(1)
 }
@@ -61,7 +66,7 @@ func main() {
 		os.Exit(0)
 	}
 	if fstr, err = readFile(os.Args[1]); err != nil {
-		Errorln(err)
+		errorln(err)
 	}
 	fmt.Print(compose(fstr))
 	os.Exit(0)
